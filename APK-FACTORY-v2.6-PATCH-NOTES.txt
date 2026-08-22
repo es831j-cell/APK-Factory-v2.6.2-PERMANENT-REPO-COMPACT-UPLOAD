@@ -1,0 +1,23 @@
+SUPERSEDED BY APK FACTORY v2.6.1 GREEN RELIABILITY PASS. Retained for history only.
+
+APK FACTORY v2.6 RELIABILITY PATCH
+
+1. GitHub artifact 404 recovery
+   - Re-queries artifact metadata and retries transient 404/403/redirect failures.
+   - Automatically saves the successful APK to Downloads/APK Factory.
+   - Hands the APK to Android's installer when APK Factory is foregrounded.
+
+2. Background operation
+   - Foreground data-sync service keeps upload/build polling alive while the app is backgrounded.
+   - Persistent notification shows build stage/progress and reopens APK Factory.
+   - Build status/log/repository URL are persisted.
+
+3. Rotation stability
+   - Orientation/screen-size changes no longer recreate MainActivity or reset the active build UI.
+
+4. Keyboard-safe controls
+   - Build, Save APK, and Open Repo are docked outside the scrolling form and remain above the soft keyboard.
+
+5. GitHub 422 SHA hardening
+   - Commit SHA is validated before branch advancement.
+   - Branch-ref advancement retries transient 404/409/422 responses with the exact commit SHA.

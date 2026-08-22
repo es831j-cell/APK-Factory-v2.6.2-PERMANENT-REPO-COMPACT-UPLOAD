@@ -1,0 +1,16 @@
+APK FACTORY 2.6.2 — REUSE / COMPACT-UPLOAD SOURCE AUDIT
+Status: GREEN FOR DEVICE VALIDATION
+Date: 2026-08-22
+
+[PASS] v262 application id
+[PASS] v2.6.2 version
+[PASS] existing repo reuse
+[PASS] compact archive path
+[PASS] two blob tree entries
+[PASS] exact replacement tree
+[PASS] workflow expands project
+[PASS] persistent repo ui
+[PASS] AndroidManifest XML parses
+[PASS] Java syntax scan: no parser-level syntax signatures
+
+Runtime gate: build/install 2.6.2 once, then use it for a real Lumi build. Keep 2.6.1 until that passes.

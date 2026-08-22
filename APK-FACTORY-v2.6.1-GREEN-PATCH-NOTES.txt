@@ -1,0 +1,31 @@
+APK Factory v2.6.1 — Green Reliability Pass
+Date: 2026-08-20
+
+Primary changes from v2.6:
+- Build ownership moved from MainActivity into the foreground service.
+- Active job state persists independently of the UI/activity.
+- START_STICKY service restart can reconnect using persisted repo/branch/commit/workflow/run IDs.
+- Selected ZIP URI is persisted using ACTION_OPEN_DOCUMENT permission where available.
+- GitHub build tracking is locked to the dedicated workflow ID + workflow_dispatch event + exact commit SHA.
+- Repository-wide artifact fallback removed, preventing the wrong workflow artifact from being selected.
+- GitHub Actions app-side wait increased to 45 minutes, matching the workflow's 40-minute timeout with recovery buffer.
+- Artifact publication/download retry window increased to 5 minutes and stays locked to the tracked run.
+- Completed APK is automatically saved to Downloads/APK Factory before the build is declared complete.
+- Completion/failure notification remains after foreground-service completion and opens APK Factory when tapped.
+- Android 15/API 35 foreground-service onTimeout callback is handled explicitly.
+- Rotation remains non-destructive via configChanges.
+- Build controls remain docked outside the scrolling form and window uses adjustResize for keyboard safety.
+- GitHub branch update always supplies/validates commit SHA and retries 404/409/422 transient propagation failures.
+- Token remains AES-GCM encrypted using Android Keystore.
+- Build log is persisted and capped to prevent unbounded preference growth.
+- Source ZIP traversal protections tightened.
+- APK Factory 2.6.1 uses applicationId com.apkfactory.v261 so it can install beside the older Factory instead of failing on an unrelated debug-signing certificate.
+- Minimum Android version is now Android 10 (API 29), matching the MediaStore Downloads implementation used for automatic APK retrieval.
+- The source package's own GitHub workflow is manual-only to avoid an unnecessary second push-triggered build when an older APK Factory uploads this project.
+
+Expected upgrade path:
+1. Build this ZIP with the currently installed APK Factory.
+2. Install APK Factory 2.6.1 beside the older APK Factory.
+3. Enter/save GitHub token once in 2.6.1.
+4. Use 2.6.1 to build Lumi Code 247.
+5. Keep the older Factory until 2.6.1 is proven on-device.

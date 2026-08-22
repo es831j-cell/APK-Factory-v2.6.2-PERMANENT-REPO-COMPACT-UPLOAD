@@ -1,0 +1,24 @@
+APK FACTORY 2.6.2 — PERMANENT REPOSITORY + COMPACT UPLOAD
+Date: 2026-08-22
+
+PURPOSE
+Avoid GitHub secondary-rate-limit failures during repeated APK Factory builds.
+
+CHANGES
+1. Repository name persists between builds and defaults to Lumi-APK-Factory-Build.
+2. If that repository already exists, APK Factory reuses it instead of creating a new repository.
+3. Each build replaces the repository tree exactly, preventing stale project files from leaking between builds.
+4. Project source is normalized and packed into apkfactory-project.zip locally.
+5. GitHub upload uses only two source blobs per build:
+   - apkfactory-project.zip
+   - .github/workflows/apk-factory-build.yml
+   This replaces the prior one-blob-per-source-file burst.
+6. GitHub Actions expands apkfactory-project.zip before running Gradle.
+7. Exact workflow/run tracking, artifact retrieval, resume state, encrypted PAT storage, and automatic APK saving remain.
+8. Application ID is com.apkfactory.v262 so 2.6.2 can install beside 2.6.1 for validation.
+
+EXPECTED EFFECT
+A Lumi project containing ~183 files no longer requires ~183 Git blob creation API calls. The compact path requires two blob creation calls plus the tree/commit/ref/workflow operations, substantially reducing burst pressure on GitHub's secondary rate limits.
+
+RUNTIME GATE
+This source package still must be compiled once and installed on the Android device. Keep APK Factory 2.6.1 installed until 2.6.2 completes a real Lumi build successfully.

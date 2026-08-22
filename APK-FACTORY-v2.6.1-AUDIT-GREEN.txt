@@ -1,0 +1,41 @@
+APK FACTORY 2.6.1 — SOURCE / RELIABILITY AUDIT
+Status: GREEN FOR DEVICE VALIDATION
+Date: 2026-08-20
+
+AUDIT SCOPE
+This audit verifies source structure and the failure modes identified in APK Factory v2.6. It does not claim that an Android APK has already been compiled or exercised on the user's phone. Runtime acceptance still requires one real build/install test.
+
+GREEN CHECKS
+[PASS] Build worker is owned by BuildKeepAliveService, not MainActivity.
+[PASS] Service is START_STICKY and can restart independently of the UI.
+[PASS] Project URI, requested repo, job ID, owner, repo, branch, commit SHA, workflow ID, run ID, status, progress, and log are persisted.
+[PASS] Repository creation has a per-job recovery marker for process death immediately after GitHub repo creation.
+[PASS] Project upload can safely retry after interruption before commit-stage persistence.
+[PASS] GitHub workflow registration can be rediscovered after restart.
+[PASS] Dispatch recovery first searches the exact dedicated workflow + workflow_dispatch + commit SHA before dispatching again.
+[PASS] Run tracking uses an exact persisted run ID.
+[PASS] Repository-wide artifact fallback was removed.
+[PASS] Artifact retrieval is locked to the tracked run ID.
+[PASS] Transient 403/404/redirect/artifact propagation errors are retried.
+[PASS] App-side workflow wait is 45 minutes; workflow timeout is 40 minutes.
+[PASS] Artifact propagation/download window is 5 minutes after build success.
+[PASS] APK is saved automatically to Downloads/APK Factory before build-complete state.
+[PASS] Completion/failure notification is detached from foreground-service teardown and remains tappable.
+[PASS] Android API 35 foreground-service onTimeout(startId, fgsType) is implemented.
+[PASS] Rotation protection remains enabled.
+[PASS] Soft-keyboard adjustResize remains enabled and action controls remain docked outside the scrolling form.
+[PASS] Branch ref update always supplies a non-empty commit SHA and retries transient 404/409/422 responses.
+[PASS] GitHub PAT remains encrypted using AES-GCM + Android Keystore.
+[PASS] Build log persistence is capped to avoid unbounded SharedPreferences growth.
+[PASS] ZIP path traversal checks were tightened.
+[PASS] Source package's own GitHub workflow is workflow_dispatch-only, avoiding a redundant push-triggered self-build.
+[PASS] Minimum SDK is API 29, matching the MediaStore Downloads implementation.
+[PASS] Application ID is com.apkfactory.v261, allowing side-by-side install with the older Factory despite unrelated debug signing certificates.
+[PASS] Java source passed a syntax parse pass (expected unresolved Android classes in this container; no Java syntax findings).
+[PASS] Android XML resource/manifest files parsed successfully.
+[PASS] GitHub Actions YAML parsed successfully.
+[PASS] No GitHub PAT literal was found in the source tree.
+
+RELEASE GATE
+Source audit: GREEN.
+Next gate: build this ZIP using the currently installed APK Factory, install APK Factory 2.6.1 beside the older Factory, then use 2.6.1 for one real Lumi Code 247 build. Keep the older Factory until this device test passes.

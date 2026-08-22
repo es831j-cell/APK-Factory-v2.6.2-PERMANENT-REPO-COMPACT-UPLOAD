@@ -1,0 +1,13 @@
+APK Factory 2.6.1 bootstrap compatibility fix
+Date: 2026-08-20
+
+Purpose:
+The currently installed older APK Factory waits for a GitHub Actions run that starts automatically after source commit. The prior 2.6.1 source archive's own build workflow allowed workflow_dispatch only, so the old Factory could upload the source successfully but then wait forever for a push-triggered run.
+
+Fix:
+- The source archive's own .github/workflows/build-apk.yml accepts BOTH push and workflow_dispatch.
+- This is only the bootstrap/self-build workflow used to create APK Factory 2.6.1 with the older Factory.
+- The APK Factory 2.6.1 application code itself still creates and dispatches its dedicated downstream build workflow explicitly, tracks exact workflow/run IDs, and does not rely on repository-wide artifact guessing.
+
+Expected bootstrap behavior:
+Old APK Factory -> create repo -> commit 2.6.1 source -> push event starts Build APK Factory 2.6.1 automatically -> artifact becomes available -> install APK Factory 2.6.1.

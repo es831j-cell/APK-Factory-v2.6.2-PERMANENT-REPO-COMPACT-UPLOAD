@@ -1,0 +1,26 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace 'com.apkfactory.v2'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.apkfactory.v262'
+        minSdk 29
+        targetSdk 35
+        versionCode 10
+        versionName '2.6.2'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

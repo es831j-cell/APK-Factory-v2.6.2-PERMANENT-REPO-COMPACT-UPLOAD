@@ -1,0 +1,91 @@
+name: Code661 Export Android Toolchain
+
+on:
+  push:
+    branches: [code661-public-build]
+    paths:
+      - '.github/workflows/code661-export-toolchain.yml'
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - uses: android-actions/setup-android@v3
+      - name: Install Lumi Android platform
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools'
+      - name: Prime Lumi Gradle dependency cache
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/lumi-cache-prime
+          mkdir -p /tmp/lumi-cache-prime/app/src/main/java/com/example
+          cat > /tmp/lumi-cache-prime/settings.gradle <<'EOF'
+          pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
+          dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.PREFER_PROJECT); repositories { google(); mavenCentral() } }
+          rootProject.name='CachePrime'
+          include ':app'
+          EOF
+          cat > /tmp/lumi-cache-prime/build.gradle <<'EOF'
+          buildscript {
+            repositories { google(); mavenCentral(); gradlePluginPortal() }
+            dependencies {
+              classpath 'com.android.tools.build:gradle:8.7.2'
+              classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21'
+            }
+          }
+          EOF
+          cat > /tmp/lumi-cache-prime/app/build.gradle <<'EOF'
+          apply plugin: 'com.android.application'
+          android { namespace 'com.example.cacheprime'; compileSdk 35
+            defaultConfig { applicationId 'com.example.cacheprime'; minSdk 28; targetSdk 35; versionCode 1; versionName '1' }
+          }
+          dependencies {
+            implementation 'androidx.core:core-ktx:1.13.1'
+            implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0'
+            implementation 'dev.ffmpegkit-maintained:llama-android:0.1.1'
+          }
+          EOF
+          cat > /tmp/lumi-cache-prime/app/src/main/AndroidManifest.xml <<'EOF'
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android"><application android:theme="@android:style/Theme.Material.Light.NoActionBar"/></manifest>
+          EOF
+          cat > /tmp/lumi-cache-prime/app/src/main/java/com/example/Dummy.java <<'EOF'
+          package com.example; public final class Dummy {}
+          EOF
+          cd /tmp/lumi-cache-prime
+          gradle :app:assembleDebug --no-daemon --stacktrace
+      - name: Bundle offline build environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/lumi-toolchain/{gradle,android-sdk,gradle-home}
+          GRADLE_BIN="$(readlink -f "$(command -v gradle)")"
+          GRADLE_ROOT="$(cd "$(dirname "$GRADLE_BIN")/.." && pwd)"
+          cp -a "$GRADLE_ROOT/." /tmp/lumi-toolchain/gradle/
+          cp -a "$ANDROID_HOME/build-tools/35.0.0" /tmp/lumi-toolchain/android-sdk/build-tools/
+          cp -a "$ANDROID_HOME/platforms/android-35" /tmp/lumi-toolchain/android-sdk/platforms/
+          cp -a "$ANDROID_HOME/platform-tools" /tmp/lumi-toolchain/android-sdk/
+          cp -a "$ANDROID_HOME/licenses" /tmp/lumi-toolchain/android-sdk/ || true
+          cp -a "$HOME/.gradle/caches" /tmp/lumi-toolchain/gradle-home/
+          cp -a "$HOME/.gradle/native" /tmp/lumi-toolchain/gradle-home/ || true
+          tar -C /tmp -czf code661-offline-android-toolchain.tgz lumi-toolchain
+          sha256sum code661-offline-android-toolchain.tgz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: code661-offline-android-toolchain
+          path: code661-offline-android-toolchain.tgz
+          retention-days: 1
+          compression-level: 0

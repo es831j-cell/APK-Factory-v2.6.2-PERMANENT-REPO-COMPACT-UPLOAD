@@ -1,0 +1,23 @@
+name: Code661 Public Toolchain Probe
+
+on:
+  push:
+    branches: [code661-public-build]
+    paths:
+      - '.github/workflows/code661-public-toolchain-probe.yml'
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prove hosted runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "CODE661_PUBLIC_RUNNER_OK"
+          uname -a
+          java -version
+          git --version
